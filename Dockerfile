@@ -1,6 +1,6 @@
 FROM docker:latest 
 
-MAINTAINER Hendrik Maus <hendrik.maus@trivago.com>
+MAINTAINER Mathias Weiß <mathias.weiss@power.cloud>
 
 ENV GLIBC_VERSION "2.32-r0"
 
@@ -15,16 +15,14 @@ RUN set -x \
  && rm -rf /tmp/glibc-${GLIBC_VERSION}.apk /var/cache/apk/* \
  && apk del gnupg openssl
 
-ARG arg_nomad_version
-ARG arg_nomad_sha256
-ENV NOMAD_VERSION $arg_nomad_version
-ENV NOMAD_SHA256 $arg_nomad_sha256
+ARG nomad_version
+ARG architecture
+ENV NOMAD_VERSION $nomad_version
+ENV ARCHITECTURE $architecture
 
-ADD https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip /tmp/nomad.zip
-RUN echo "${NOMAD_SHA256}  /tmp/nomad.zip" > /tmp/nomad.sha256 \
- && sha256sum -c /tmp/nomad.sha256 \
- && cd /bin \
- && unzip /tmp/nomad.zip \
- && chmod +x /bin/nomad \
- && rm /tmp/nomad.zip \
- && nomad version
+ADD https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_${ARCHITECTURE}.zip /tmp/nomad.zip
+RUN cd /bin \
+  && unzip /tmp/nomad.zip \
+  && chmod +x /bin/nomad \
+  && rm /tmp/nomad.zip \
+  && nomad version
