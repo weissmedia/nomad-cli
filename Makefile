@@ -32,7 +32,6 @@ docker-login: ## auto login to docker repository
 
 docker-builder-create: ## create the builder
 	docker buildx create --name amr64 --platform linux/amd64,linux/arm64
-	docker buildx inspect arm64 --bootstrap
 
 docker-builder-set: ## set current builder instance
 	docker buildx use amr64
