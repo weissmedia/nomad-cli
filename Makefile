@@ -30,10 +30,14 @@ docker-login: ## auto login to docker repository
 	docker login $(DOCKER_LOGIN_CREDENTIALS) $(DOCKER_REPOSITORY)
 
 ##@ Building
+show-arch: ## shows all available architectures
+	@curl -s https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_SHA256SUMS -o /tmp/nomad_SHA256SUMS
+	@awk -F_ '{print $$3"_"$$4}' /tmp/nomad_SHA256SUMS | cut -d'.' -f1
+
 arch-conv = $(word $2,$(subst _, ,$1))
 build/%: IMAGE_TAG?=latest
 build/%: DARGS?=
-build/%: ## build the latest image
+build/%: ## build the latest image (e.g. build/linux_amd64)
 	$(eval ARCH := $(call arch-conv,$(notdir $@),1)/$(call arch-conv,$(notdir $@),2))
 	@echo "::group::Build $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME) (system's architecture)"
 	docker buildx build $(DARGS) --rm --force-rm -t $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME):$(IMAGE_TAG) --build-arg nomad_version=$(NOMAD_VERSION) --build-arg architecture=$(notdir $@) . --load

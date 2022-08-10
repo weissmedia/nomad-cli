@@ -8,7 +8,7 @@ Docker image with [Nomad](https://github.com/hashicorp/nomad) inside of it to be
 ```bash
 docker run \
     -v ${PWD}/service.nomad:/service.nomad \
-    hendrikmaus/nomad-cli \
+    weissmedia/nomad-cli \
     nomad run \
     -address=http://your-nomad:4646 \
     service.nomad
@@ -26,7 +26,8 @@ GitHub Actions runs every day at 1730 hours.
 
 ### Manual Build
 
-```bash
+```make
+make show-arch
 make build/linux_amd64 push
 ```
 
