@@ -30,7 +30,11 @@ docker-login: DOCKER_LOGIN_CREDENTIALS?=
 docker-login: ## auto login to docker repository
 	docker login $(DOCKER_LOGIN_CREDENTIALS) $(DOCKER_REPOSITORY)
 
-docker-builder: ## set current builder instance
+docker-builder-create: ## create the builder
+	docker buildx create --name amr64 --platform linux/amd64,linux/arm64
+	docker buildx inspect arm64 --bootstrap
+
+docker-builder-set: ## set current builder instance
 	docker buildx use amr64
 
 ##@ Levant
@@ -53,7 +57,7 @@ show-arch: ## shows all available architectures
 arch-conv = $(word $2,$(subst _, ,$1))
 build/%: IMAGE_TAG?=latest
 build/%: DARGS?=
-build/%: docker-builder ## build the latest image (e.g. build/linux_amd64)
+build/%: docker-builder-set ## build the latest image (e.g. build/linux_amd64)
 	$(eval NOMAD_ARCH := $(call arch-conv,$(notdir $@),1)/$(call arch-conv,$(notdir $@),2))
 	@echo "::group::Build $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME) (system's architecture)"
 	docker buildx build $(DARGS) --rm --force-rm \
