@@ -30,6 +30,9 @@ docker-login: DOCKER_LOGIN_CREDENTIALS?=
 docker-login: ## auto login to docker repository
 	docker login $(DOCKER_LOGIN_CREDENTIALS) $(DOCKER_REPOSITORY)
 
+docker-driver: ## switch to docker driver buildx
+	docker buildx create --use
+
 ##@ Levant
 levant-get:
 	@rm -rf /tmp/levant \
@@ -50,7 +53,7 @@ show-arch: ## shows all available architectures
 arch-conv = $(word $2,$(subst _, ,$1))
 build/%: IMAGE_TAG?=latest
 build/%: DARGS?=
-build/%: ## build the latest image (e.g. build/linux_amd64)
+build/%: docker-driver ## build the latest image (e.g. build/linux_amd64)
 	$(eval NOMAD_ARCH := $(call arch-conv,$(notdir $@),1)/$(call arch-conv,$(notdir $@),2))
 	@echo "::group::Build $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME) (system's architecture)"
 	docker buildx build $(DARGS) --rm --force-rm \
