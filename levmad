@@ -1,0 +1,14 @@
+#!/bin/sh
+# shellcheck disable=SC2220
+
+template=""
+while getopts t: opt 2>/dev/null
+do
+  case $opt in
+    t) template=$OPTARG;;
+    ?) echo "($0): An error with the option specification"
+esac done
+
+
+levant render -out /tmp/rendered.nomad "$template"
+nomad run -address="${NOMAD_ADDR}" /tmp/rendered.nomad

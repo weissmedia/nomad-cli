@@ -31,3 +31,5 @@ RUN cd /bin \
   && chmod +x /bin/nomad \
   && rm /tmp/nomad.zip \
   && nomad version
+
+ADD levmad /bin/levmad

@@ -6,7 +6,7 @@ all: help
 
 # Use bash for inline if-statements
 SHELL:=bash
-APP_NAME=nomad-cli
+APP_NAME=orca-cli
 OWNER?=weissmedia
 DOCKER_REPOSITORY?=registry.hub.docker.com
 
@@ -64,9 +64,18 @@ build/%: docker-builder-set ## build the latest image (e.g. build/linux_amd64)
 		--build-arg nomad_version=$(NOMAD_VERSION) \
 		--build-arg nomad_arch=$(notdir $@) \
 		--build-arg levant_version=$(LEVANT_VERSION) \
-		. --push --platform linux/arm64
+		. --load
 	@echo -n "Built image size: "
 	@docker images $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME):$(IMAGE_TAG) --format "{{.Size}}"
+	@echo "::endgroup::"
+
+	@echo "::group::Build $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME) $(NOMAD_ARCH)"
+	docker buildx build $(DARGS) --rm --force-rm \
+		-t build-multi-tmp-cache/$(APP_NAME):$(IMAGE_TAG) \
+		--build-arg nomad_version=$(NOMAD_VERSION) \
+		--build-arg nomad_arch=$(notdir $@) \
+		--build-arg levant_version=$(LEVANT_VERSION) \
+		. --platform "$(NOMAD_ARCH),linux/arm64"
 	@echo "::endgroup::"
 
 ##@ Pushing and pulling images
