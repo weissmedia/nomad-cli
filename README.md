@@ -25,6 +25,7 @@ You can find the images on Dockerhub https://hub.docker.com/r/hendrikmaus/nomad-
 GitHub Actions runs every day at 1730 hours.
 
 ### Manual Build
+###### Important: Check ssh-add -L locally to see if the public keys are visible to the agent. If they are not, try to run ssh-add -K.
 
 ```make
 make show-arch

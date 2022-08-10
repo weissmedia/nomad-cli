@@ -1,8 +1,18 @@
-FROM docker:latest 
+# syntax=docker/dockerfile:1.0.0-experimental
+ARG levant_version
 
-MAINTAINER Mathias Weiß <mathias.weiss@power.cloud>
+FROM hashicorp/levant:$levant_version AS levant
+
+FROM docker:latest
+
+COPY --from=levant /bin/levant /bin/levant
+
+ARG nomad_version
+ARG nomad_arch
 
 ENV GLIBC_VERSION "2.32-r0"
+ENV NOMAD_VERSION $nomad_version
+ENV NOMAD_ARCH $nomad_arch
 
 RUN set -x \
  # per https://github.com/hashicorp/nomad/issues/5535#issuecomment-651888183
@@ -15,12 +25,7 @@ RUN set -x \
  && rm -rf /tmp/glibc-${GLIBC_VERSION}.apk /var/cache/apk/* \
  && apk del gnupg openssl
 
-ARG nomad_version
-ARG architecture
-ENV NOMAD_VERSION $nomad_version
-ENV ARCHITECTURE $architecture
-
-ADD https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_${ARCHITECTURE}.zip /tmp/nomad.zip
+ADD https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_${NOMAD_ARCH}.zip /tmp/nomad.zip
 RUN cd /bin \
   && unzip /tmp/nomad.zip \
   && chmod +x /bin/nomad \
