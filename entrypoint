@@ -6,14 +6,14 @@ set -o nounset
 echo "$@"
 args=( "$@" )
 
-if [ 'nomad' = "$1" ]
+if [ 'nomad' = "$1" ] && [ 'run' = "$2" -o 'plan' = "$2" ]
 then
   cmd=${args[@]:0:$# -1}
   tmpl=${args[@]: -1}
   interpol "$tmpl" 2 > /tmp/rendered.nomad
   cat /tmp/rendered.nomad
   echo -e '\n'
-  exec "$cmd" /tmp/rendered.nomad
+  exec ${cmd} /tmp/rendered.nomad
 else
   exec "$@"
 fi
