@@ -8,7 +8,7 @@ all: help
 SHELL:=bash
 APP_NAME=orca-cli
 OWNER?=weissmedia
-DOCKER_REPOSITORY?=registry.hub.docker.com
+DOCKER_REPOSITORY?=docker.io
 
 # Enable BuildKit for Docker build
 export DOCKER_BUILDKIT:=1
@@ -58,18 +58,18 @@ build/%: IMAGE_TAG?=latest
 build/%: DARGS?=
 build/%: docker-builder-set ## build the latest image (e.g. build/linux_amd64)
 	$(eval NOMAD_ARCH := $(call arch-conv,$(notdir $@),1)/$(call arch-conv,$(notdir $@),2))
-	@echo "::group::Build $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME) (system's architecture)"
+	@echo "::group::Build $(OWNER)/$(APP_NAME) (system's architecture)"
 	docker buildx build $(DARGS) --rm --force-rm \
-		-t $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME):$(IMAGE_TAG) \
+		-t $(OWNER)/$(APP_NAME):$(IMAGE_TAG) \
 		--build-arg nomad_version=$(NOMAD_VERSION) \
 		--build-arg nomad_arch=$(notdir $@) \
 		--build-arg levant_version=$(LEVANT_VERSION) \
 		. --load
 	@echo -n "Built image size: "
-	@docker images $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME):$(IMAGE_TAG) --format "{{.Size}}"
+	@docker images $(OWNER)/$(APP_NAME):$(IMAGE_TAG) --format "{{.Size}}"
 	@echo "::endgroup::"
 
-	@echo "::group::Build $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME) $(NOMAD_ARCH)"
+	@echo "::group::Build $(OWNER)/$(APP_NAME) $(NOMAD_ARCH)"
 	docker buildx build $(DARGS) --rm --force-rm \
 		-t build-multi-tmp-cache/$(APP_NAME):$(IMAGE_TAG) \
 		--build-arg nomad_version=$(NOMAD_VERSION) \
@@ -81,9 +81,13 @@ build/%: docker-builder-set ## build the latest image (e.g. build/linux_amd64)
 ##@ Pushing and pulling images
 pull: IMAGE_TAG?=latest
 pull: ## pull image
-	docker pull $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME):$(IMAGE_TAG)
+	docker pull $(OWNER)/$(APP_NAME):$(IMAGE_TAG)
 
 push: docker-login ## push all tags
-	@echo "::group::Push $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME) (system's architecture)"
-	docker push --all-tags $(DOCKER_REPOSITORY)/$(OWNER)/$(APP_NAME)
+	@echo "::group::Push $(OWNER)/$(APP_NAME) (system's architecture)"
+	docker push --all-tags $(OWNER)/$(APP_NAME)
 	@echo "::endgroup::"
+
+##@ Remove image
+image-rm: ## remove image
+	docker image rm -f $(OWNER)/$(APP_NAME)

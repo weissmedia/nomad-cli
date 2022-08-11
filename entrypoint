@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+echo "$@"
+args=( "$@" )
+
+if [ 'nomad' = "$1" ]
+then
+  cmd=${args[@]:0:$# -1}
+  tmpl=${args[@]: -1}
+  interpol "$tmpl" 2 > /tmp/rendered.nomad
+  cat /tmp/rendered.nomad
+  echo -e '\n'
+  exec "$cmd" /tmp/rendered.nomad
+else
+  exec "$@"
+fi

@@ -9,6 +9,8 @@ do
     ?) echo "($0): An error with the option specification"
 esac done
 
-
-levant render -out /tmp/rendered.nomad "$template"
+sed 's/'"'"'/"/g' "$template" > __rendered__.nomad
+levant render -out /tmp/rendered.nomad __rendered__.nomad
+cat /tmp/rendered.nomad
+echo -e '\n'
 nomad run -address="${NOMAD_ADDR}" /tmp/rendered.nomad

@@ -19,7 +19,7 @@ RUN set -x \
  && export -n LD_BIND_NOW \
  # per https://github.com/sgerrand/alpine-pkg-glibc/issues/51#issuecomment-302530493
  && apk del libc6-compat \
- && apk --update add --no-cache --virtual tzdata dpkg curl ca-certificates gnupg libcap openssl dumb-init \
+ && apk --update add --no-cache --virtual tzdata dpkg curl ca-certificates gnupg libcap openssl dumb-init bash \
  && curl -Ls https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk > /tmp/glibc-${GLIBC_VERSION}.apk \
  && apk add --allow-untrusted --no-cache /tmp/glibc-${GLIBC_VERSION}.apk \
  && rm -rf /tmp/glibc-${GLIBC_VERSION}.apk /var/cache/apk/* \
@@ -32,4 +32,11 @@ RUN cd /bin \
   && rm /tmp/nomad.zip \
   && nomad version
 
-ADD levmad /bin/levmad
+ADD ./levmad /bin/levmad
+ADD ./interpol /bin/interpol
+
+COPY ./entrypoint /entrypoint
+RUN sed -i 's/\r$//g' /entrypoint
+RUN chmod +x /entrypoint
+
+ENTRYPOINT ["/entrypoint"]
