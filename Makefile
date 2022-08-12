@@ -6,9 +6,11 @@ all: help
 
 # Use bash for inline if-statements
 SHELL:=bash
+
 APP_NAME=orca-cli
 OWNER?=weissmedia
 DOCKER_REPOSITORY?=docker.io
+DOCKER_BUILD_PLATFORMS?="linux/amd64,linux/arm64"
 
 # Enable BuildKit for Docker build
 export DOCKER_BUILDKIT:=1
@@ -76,6 +78,19 @@ build/%: docker-builder-set ## build the latest image (e.g. build/linux_amd64)
 		--build-arg nomad_arch=$(notdir $@) \
 		--build-arg levant_version=$(LEVANT_VERSION) \
 		. --platform "$(NOMAD_ARCH),linux/arm64"
+	@echo "::endgroup::"
+
+buildx/%: IMAGE_TAG?=latest
+buildx/%: DARGS?=
+buildx/%: ## build the latest image (e.g. buildx/linux_amd64)
+	@echo "::group::BuildX $(OWNER)/$(APP_NAME) for system's architecture $(DOCKER_BUILD_PLATFORMS)"
+	docker buildx build $(DARGS) --rm --force-rm \
+		-t $(OWNER)/$(APP_NAME):$(IMAGE_TAG) \
+		--build-arg nomad_version=$(NOMAD_VERSION) \
+		--build-arg nomad_arch=$(notdir $@) \
+		--build-arg levant_version=$(LEVANT_VERSION) \
+		--platform $(DOCKER_BUILD_PLATFORMS) \
+		--push .
 	@echo "::endgroup::"
 
 ##@ Pushing and pulling images
