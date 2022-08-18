@@ -21,7 +21,6 @@ export TAG_NAME:=$(shell echo $(BRANCH_NAME) | sed 's/\//-/')
 export DOCKER_BUILDKIT:=1
 export BUILDKIT_INLINE_CACHE:=1
 export COMPOSE_DOCKER_CLI_BUILD:=1
-export DOCKER_DEFAULT_PLATFORM:=linux/amd64
 
 # Nomad configuration
 export NOMAD_VERSION?=1.3.3
@@ -73,9 +72,12 @@ build-multi/%: DARGS?=
 build-multi/%: ## build the multi image (e.g. build/linux_amd64)
 	@echo "::group::build-multi $(OWNER)/$(APP_NAME) for multi system architecture $(DOCKER_BUILD_PLATFORMS)"
 	$(MAKE) build/$(notdir $@) DARGS="--platform $(DOCKER_BUILD_PLATFORMS) $(DARGS)" IMAGE_TAG=$(IMAGE_TAG)
+	@echo "::endgroup::"
 
 push/%: ## push the multi image with all tags (e.g. build/linux_amd64)
+	@echo "::group::push $(OWNER)/$(APP_NAME) the multi system architecture images"
 	$(MAKE) build-multi/$(notdir $@) DARGS=--push
+	@echo "::endgroup::"
 
 ##@ Removing
 image-rm: ## remove image
