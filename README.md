@@ -24,12 +24,14 @@ You can find the images on Dockerhub https://hub.docker.com/r/hendrikmaus/nomad-
 ### Automatic Daily Build
 GitHub Actions runs every day at 1730 hours.
 
-### Manual Build
+### Manual build and push
 ###### Important: Check ssh-add -L locally to see if the public keys are visible to the agent. If they are not, try to run ssh-add -K.
 
 ```make
 make show-arch
-make build/linux_amd64 push
+make build/linux_amd64 # for the own system architecture
+make build-multi/linux_amd64 # for the multi system architecture
+make push/linux_amd64 # build and push the image of the multi system architecture with all tags 
 ```
 
 > You can find all releases and checksums at https://releases.hashicorp.com/nomad/
