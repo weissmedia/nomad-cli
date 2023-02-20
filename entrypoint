@@ -3,7 +3,7 @@
 set -o errexit
 set -o nounset
 
-echo "$@"
+#echo "$@"
 args=( "$@" )
 
 if [ 'nomad' = "$1" ] && [ 'run' = "$2" -o 'plan' = "$2" ]
