@@ -14,6 +14,9 @@ docker run \
     service.nomad
 ```
 
+### Interpol
+- [Sprig Function Documentation](http://masterminds.github.io/sprig/)
+
 ## Dockerhub
 You can find the images on Dockerhub https://hub.docker.com/r/hendrikmaus/nomad-cli/
 
