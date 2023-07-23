@@ -57,7 +57,7 @@ build: DARGS?=--load
 build: ## build the image
 	docker buildx build $(DARGS) --rm --force-rm --no-cache \
 		-t $(OWNER)/$(APP_NAME):latest \
-		-t $(OWNER)/$(APP_NAME):interpol-48bc76dfb65 \
+		-t $(OWNER)/$(APP_NAME):interpol-$(shell git rev-parse --short HEAD) \
 		-t $(OWNER)/$(APP_NAME):nomad-$(NOMAD_VERSION) \
 		-t $(OWNER)/$(APP_NAME):levant-$(LEVANT_VERSION) \
 		--build-arg nomad_version=$(NOMAD_VERSION) \
