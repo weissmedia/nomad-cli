@@ -3,6 +3,8 @@
 set -o errexit
 set -o nounset
 
+export INTERPOL_ENV_BACKPACK=$(env | grep -v -e INTERPOL_ENV_BACKPACK | base64)
+
 echo "$@" > /tmp/rendered.command
 args=( "$@" )
 
