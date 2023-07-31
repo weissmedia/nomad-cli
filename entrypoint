@@ -5,6 +5,7 @@ set -o nounset
 
 
 export INTERPOL_ENVS="${INTERPOL_ENVS:-$(env | while read kv; do echo $kv | sed 's/^NOMAD_VAR_//'; done|base64)}"
+export NOMAD_VAR_INTERPOL_ENVS=${INTERPOL_ENVS}
 
 echo "$@" > /tmp/rendered.command
 args=( "$@" )
