@@ -4,7 +4,7 @@ set -o errexit
 set -o nounset
 
 
-export INTERPOL_ENVS="${INTERPOL_ENVS:-$(env | while read kv; do echo $$kv | sed 's/^NOMAD_VAR_//'; done | base64)}"
+export INTERPOL_ENVS="${INTERPOL_ENVS:-$(env | while read kv; do echo $kv | sed 's/^NOMAD_VAR_//'; done | base64)}"
 
 echo "$@" > /tmp/rendered.command
 args=( "$@" )
