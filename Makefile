@@ -78,6 +78,7 @@ INTERPOL = docker run \
     	weissmedia/orca-cli:$(INTERPOL_VERSION) \
     	interpol $(1) $(2)
 
-test-interpol: export INTERPOL_ENVS=$(shell echo -n "FOO_BAR_BAZ=foobarbaz_v2" | base64)
+#test-interpol: export INTERPOL_ENVS=$(shell echo -n "FOO_BAR_BAZ=foobarbaz_v2" | base64)
+test-interpol: export INTERPOL_ENVS=$(shell env | while read kv; do echo $$kv | sed 's/^NOMAD_VAR_//'; done|base64)
 test-interpol: build
 	@$(call INTERPOL,"test-interpol.txt",2)
