@@ -3,7 +3,8 @@
 set -o errexit
 set -o nounset
 
-export INTERPOL_ENVS=$(env | grep -v -e INTERPOL_ENVS | base64)
+
+export INTERPOL_ENVS="${INTERPOL_ENVS:-$(env | base64)}"
 
 echo "$@" > /tmp/rendered.command
 args=( "$@" )

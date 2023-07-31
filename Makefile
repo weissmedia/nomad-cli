@@ -24,6 +24,7 @@ export COMPOSE_DOCKER_CLI_BUILD:=1
 # Nomad configuration
 export NOMAD_VERSION?=1.5.6
 export LEVANT_VERSION?=0.3.1
+export INTERPOL_VERSION=interpol-$(shell git rev-parse --short HEAD)
 
 ##@ Helpers
 help: ## display this help
@@ -57,7 +58,7 @@ build: DARGS?=--load
 build: ## build the image
 	docker buildx build $(DARGS) --rm --force-rm --no-cache \
 		-t $(OWNER)/$(APP_NAME):latest \
-		-t $(OWNER)/$(APP_NAME):interpol-$(shell git rev-parse --short HEAD) \
+		-t $(OWNER)/$(APP_NAME):$(INTERPOL_VERSION) \
 		-t $(OWNER)/$(APP_NAME):nomad-$(NOMAD_VERSION) \
 		-t $(OWNER)/$(APP_NAME):levant-$(LEVANT_VERSION) \
 		--build-arg nomad_version=$(NOMAD_VERSION) \
@@ -67,3 +68,16 @@ build: ## build the image
 push: ## push the image
 	$(MAKE) build DARGS=--push
 
+INTERPOL = docker run \
+    	--rm \
+    	--name $(shell uuidgen) \
+    	--env-file <(env | grep -v TMPDIR | while read kv; do echo $$kv; echo "NOMAD_VAR_$$kv"; done) \
+    	--workdir /app \
+    	--volume $(PWD):/app \
+    	--volume $(PWD)/.tmp/:/tmp \
+    	weissmedia/orca-cli:$(INTERPOL_VERSION) \
+    	interpol $(1) $(2)
+
+test-interpol: export INTERPOL_ENVS=$(shell echo -n "FOO_BAR_BAZ=foobarbaz_v2" | base64)
+test-interpol: build
+	@$(call INTERPOL,"test-interpol.txt",2)

@@ -1,0 +1,2 @@
+[[.INTERPOL_ENVS | b64dec]]
+[[.FOO_BAR_BAZ]]
